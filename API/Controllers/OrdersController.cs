@@ -16,14 +16,21 @@ public class OrdersController : ControllerBase
     }
 
     [HttpGet("{customerId}/orders")]
-    public async Task<ActionResult<List<CustomerOrderDto>>> GetOrdersByCustomer(int customerId)
+    public async Task<ActionResult<object>> GetOrdersByCustomer(
+        int customerId,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string sortBy = "orderid",
+        [FromQuery] string sortOrder = "asc")
     {
-        var orders = await _service.GetOrdersByCustomerIdAsync(customerId);
-        if (orders == null || !orders.Any())
+        var result = await _service.GetOrdersByCustomerPagedAsync(customerId, page, pageSize, sortBy, sortOrder);
+
+        if (!result.Data.Any())
             return NotFound();
 
-        return Ok(orders); 
+        return Ok(new { data = result.Data, total = result.Total });
     }
+
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateOrderDto dto)

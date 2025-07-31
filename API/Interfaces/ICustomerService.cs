@@ -4,6 +4,6 @@ namespace API.Interfaces
 {
     public interface ICustomerService
     {
-        Task<List<CustomerPredictionDto>> GetPredictionsAsync();
+        Task<(List<CustomerPredictionDto> Data, int Total)> GetPredictionsAsync(int page, int pageSize, string sortBy, string sortOrder, string? search);
     }
 }

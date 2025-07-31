@@ -6,37 +6,51 @@ using System.Threading.Tasks;
 using API.DTOs;
 using API.Interfaces;
 using API.Services;
-using API.Models;
 
 public class CustomerServiceTests
 {
     [Fact]
-    public async Task GetPredictionsAsync_ReturnsPredictedOrders()
+    public async Task GetPredictionsAsync_ReturnsPagedPredictions()
     {
         // Arrange
         var mockRepo = new Mock<ICustomerRepository>();
-        var sampleOrders = new List<Order>
+
+        var sampleData = new List<CustomerPredictionDto>
         {
-            new Order { Custid = 1, Orderdate = new DateTime(2024, 1, 1), Cust = new Customer { Companyname = "Acme Corp" } },
-            new Order { Custid = 1, Orderdate = new DateTime(2024, 1, 15), Cust = new Customer { Companyname = "Acme Corp" } },
-            new Order { Custid = 1, Orderdate = new DateTime(2024, 1, 30), Cust = new Customer { Companyname = "Acme Corp" } }
+            new CustomerPredictionDto
+            {
+                CustomerName = "Acme Corp",
+                LastOrderDate = new DateTime(2024, 1, 30),
+                NextPredictedOrder = new DateTime(2024, 2, 15)
+            },
+            new CustomerPredictionDto
+            {
+                CustomerName = "Globex Inc",
+                LastOrderDate = new DateTime(2024, 2, 5),
+                NextPredictedOrder = new DateTime(2024, 2, 28)
+            }
         };
 
-        mockRepo.Setup(r => r.GetAllOrdersWithCustomerAsync())
-                .ReturnsAsync(sampleOrders);
+        int expectedTotal = sampleData.Count;
+        int page = 1;
+        int pageSize = 10;
+        string sortBy = "CustomerName";
+        string sortOrder = "asc";
+        string? search = null;
+
+        mockRepo.Setup(r => r.GetPredictionsAsync(page, pageSize, sortBy, sortOrder, search))
+                .ReturnsAsync((sampleData, expectedTotal));
 
         var service = new CustomerService(mockRepo.Object);
 
         // Act
-        var result = await service.GetPredictionsAsync();
+        var result = await service.GetPredictionsAsync(page, pageSize, sortBy, sortOrder, search);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Single(result);
-
-        var prediction = result[0];
-        Assert.Equal("Acme Corp", prediction.CustomerName);
-        Assert.Equal(new DateTime(2024, 1, 30), prediction.LastOrderDate);
-        Assert.True(prediction.NextPredictedOrder > prediction.LastOrderDate); // It must be an estimated future date.
+        Assert.Equal(expectedTotal, result.Total);
+        Assert.Equal(sampleData.Count, result.Data.Count);
+        Assert.Equal("Acme Corp", result.Data[0].CustomerName);
+        Assert.True(result.Data[0].NextPredictedOrder > result.Data[0].LastOrderDate);
     }
 }

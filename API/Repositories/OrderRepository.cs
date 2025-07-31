@@ -14,19 +14,44 @@ public class OrderRepository : IOrderRepository
         _context = context;
     }
 
-    public async Task<List<CustomerOrderDto>> GetOrdersByCustomerIdAsync(int customerId)
+    public async Task<(List<CustomerOrderDto> Data, int Total)> GetOrdersByCustomerIdPagedAsync(
+        int customerId,
+        int page,
+        int pageSize,
+        string sortBy,
+        string sortOrder)
     {
-        return await _context.Orders
+        var query = _context.Orders
             .Where(o => o.Custid == customerId)
             .Select(o => new CustomerOrderDto
             {
                 OrderId = o.Orderid,
-                OrderDate = o.Orderdate,
+                RequiredDate = o.Requireddate,
+                ShippedDate = o.Shippeddate,
                 ShipName = o.Shipname,
-                Freight = o.Freight
-            })
+                ShipAddress = o.Shipaddress,
+                ShipCity = o.Shipcity
+            });
+
+        query = sortBy.ToLower() switch
+        {
+            "requireddate" => sortOrder == "desc" ? query.OrderByDescending(o => o.RequiredDate) : query.OrderBy(o => o.RequiredDate),
+            "shippeddate" => sortOrder == "desc" ? query.OrderByDescending(o => o.ShippedDate) : query.OrderBy(o => o.ShippedDate),
+            "shipname" => sortOrder == "desc" ? query.OrderByDescending(o => o.ShipName) : query.OrderBy(o => o.ShipName),
+            "shipaddress" => sortOrder == "desc" ? query.OrderByDescending(o => o.ShipAddress) : query.OrderBy(o => o.ShipAddress),
+            "shipcity" => sortOrder == "desc" ? query.OrderByDescending(o => o.ShipCity) : query.OrderBy(o => o.ShipCity),
+            _ => sortOrder == "desc" ? query.OrderByDescending(o => o.OrderId) : query.OrderBy(o => o.OrderId)
+        };
+
+        var total = await query.CountAsync();
+        var data = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        return (data, total);
     }
+
 
     public async Task<int> CreateOrderWithProductAsync(CreateOrderDto dto)
     {
@@ -40,7 +65,7 @@ public class OrderRepository : IOrderRepository
             Shipcity = dto.ShipCity,
             Shipcountry = dto.ShipCountry,
             Freight = dto.Freight,
-            Orderdate = DateTime.Now,
+            Orderdate = dto.OrderDate ?? DateTime.Now,
             Requireddate = dto.RequiredDate ?? DateTime.Now.AddDays(7),
             Shippeddate = dto.ShippedDate
         };

@@ -16,10 +16,12 @@ public class OrderService : IOrderService
         _repository = repository;
     }
 
-    public async Task<List<CustomerOrderDto>> GetOrdersByCustomerIdAsync(int customerId)
+    public async Task<(List<CustomerOrderDto> Data, int Total)> GetOrdersByCustomerPagedAsync(
+        int customerId, int page, int pageSize, string sortBy, string sortOrder)
     {
-        return await _repository.GetOrdersByCustomerIdAsync(customerId);
+        return await _repository.GetOrdersByCustomerIdPagedAsync(customerId, page, pageSize, sortBy, sortOrder);
     }
+
     public async Task<int> CreateOrderAsync(CreateOrderDto dto)
     {
         var product = await _context.Products.FindAsync(dto.ProductId);
