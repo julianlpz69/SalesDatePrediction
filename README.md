@@ -1,14 +1,53 @@
-📌 Sales Date Prediction – Technical Test
-Sales Date Prediction is a technical assessment project that consists of building a complete full-stack application. The objective is to create and manage customer orders and predict when each customer is likely to place their next order based on historical data.
+# Technical Test - Julian Jose Lopez Arellano
 
-The project is divided into the following components:
+**Estimated Time**: 10 hours  
+**Time Spent**: 8 hours
 
-Backend (Web API in .NET Core): Exposes REST endpoints to manage customers, employees, shippers, products, and orders. Includes logic to predict the next order date per customer.
+---
 
-Frontend (Angular 17+ SPA): Displays customer data, order history, and a form to create new orders. Supports filtering, sorting, and pagination.
+## 📁 Project Structure
 
-Database (SQL Server): Includes the base schema and additional queries such as views and stored procedures to retrieve and manage data.
+- **`Database/`**  
+   Contains the queries and SQL scripts requested in point 2 of the task description
 
-D3.js Visualization (Vanilla JS): A small component to build a bar chart from numeric data entered by the user.
+- **`API/`**  
+  Backend project developed using ASP.NET Core. It includes controllers, services, repositories, and models to manage data from the database.  
+  🔧 **To run the API:**
 
-This project was built as part of a technical test for a developer position.
+  ```bash
+  dotnet run
+  ```
+
+- **`API.Tests/`**  
+  Unit test project developed using xUnit for backend service validation. Ensures business logic is properly tested.  
+  🧪 **To run the tests:**
+
+  ```bash
+  dotnet test
+  ```
+
+- **`web-app/`**  
+  Frontend project developed with Angular. Communicates with the backend API to display and manage data through the web interface.  
+  🌐 **To run the app:**
+
+  ```bash
+  ng serve
+  ```
+
+- **`grafic-d3-bar-chart/`**  
+  A lightweight bar chart visualization built with **D3.js** and **vanilla JavaScript**, allowing dynamic input and rendering of bar charts.  
+  📊 **To run the chart app:**
+  ```bash
+  npx http-server
+  ```
+  > Alternatively, open `index.html` in your browser without using a local server.
+
+---
+
+## ✅ Conclusion
+
+Thank you for the opportunity to work on this technical challenge.  
+I'm happy to answer any questions or provide additional explanations if needed.
+
+**Kind regards,**  
+**Julian Jose Lopez Arellano**
