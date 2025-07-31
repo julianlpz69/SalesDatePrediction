@@ -31,7 +31,8 @@
   🌐 **To run the app:**
 
   ```bash
-  ng serve
+   npm install   # Install all required dependencies
+   ng serve      # Start the development server
   ```
 
 - **`grafic-d3-bar-chart/`**  
